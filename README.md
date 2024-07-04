@@ -1,2 +1,9 @@
-# I wanna pygame
-An I wanna fangame but written in Python using Pygame!
+实现关卡切换，以及对应的
+
+实现添加切换传送入口
+
+我的字母键盘无法使用了
+
+backspace是重新开始游戏。空格是跳跃。
+
+shift或者出发关卡是进入下一关

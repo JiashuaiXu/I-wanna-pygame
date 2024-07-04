@@ -16,6 +16,7 @@ class TileMap:
         self.tile_size = 0
         self.offgrid_tiles = []
         self.player_pos = ()
+        self.portal_pos = ()  # 添加 portal_pos 属性
         self.room_to = ''
 
     def tiles_around(self, pos, solid=True):
@@ -72,23 +73,58 @@ class TileMap:
 
         return matches
 
-    def load(self, path: str):
-        f = open(path, 'r')
-        map_data = json.load(f)
-        f.close()
+    # def load(self, path: str):
+    #     f = open(path, 'r')
+    #     map_data = json.load(f)
+    #     f.close()
 
+    #     self.map_type = map_data['map_type']
+    #     self.background = map_data['background']
+    #     self.tile_size = map_data['tile_size']
+    #     self.solid_tile = map_data['solid_tile']
+    #     self.tile = map_data['tile']
+    #     self.offgrid_tiles = map_data['offgrid']
+    #     if self.map_type == 'title':
+    #         self.room_to = map_data['room_to']
+    #     elif self.map_type == 'select':
+    #         pass
+    #     else:
+    #         self.player_pos = map_data['player']
+    #         self.portal_pos = map_data.get('portal_pos', ())  # 解析 portal_pos
+    # def load(self, path: str):
+    #     f = open(path, 'r')
+    #     map_data = json.load(f)
+    #     f.close()
+
+    #     self.map_type = map_data['map_type']
+    #     self.background = map_data['background']
+    #     self.tile_size = map_data['tile_size']
+    #     self.solid_tile = map_data['solid_tile']
+    #     self.tile = map_data['tile']
+    #     self.offgrid_tiles = map_data['offgrid']
+    #     self.player_pos = map_data.get('player', (0, 0))  # 若无数据则使用默认值
+
+    #     # 正确解析 portal_pos 为字典形式
+    #     self.portal_pos = map_data.get('portal_pos', {}).get('pos', (None, None))
+
+    #     if self.map_type in ['title', 'select']:
+    #         self.room_to = map_data.get('room_to', '')
+    def load(self, path: str):
+        with open(path, 'r') as f:
+            map_data = json.load(f)
         self.map_type = map_data['map_type']
         self.background = map_data['background']
         self.tile_size = map_data['tile_size']
         self.solid_tile = map_data['solid_tile']
         self.tile = map_data['tile']
         self.offgrid_tiles = map_data['offgrid']
-        if self.map_type == 'title':
-            self.room_to = map_data['room_to']
-        elif self.map_type == 'select':
-            pass
-        else:
-            self.player_pos = map_data['player']
+        self.player_pos = map_data.get('player', (0, 0))
+
+        # 确保总是获取有效的 portal_pos 或设置为默认值
+        self.portal_pos = tuple(map_data.get('portal_pos', {}).get('pos', (0, 0)))
+        if 'portal_pos' not in map_data:
+            self.portal_pos = None  # 或者设置为 None，如果没有定义传送门位置
+
 
     def save(self, path: str):
         f = open(path, 'w')
@@ -99,6 +135,8 @@ class TileMap:
             'tile_size': self.tile_size,
             'solid_tile': self.solid_tile,
             'tile': self.tile,
-            'offgrid': self.offgrid_tiles
+            'offgrid': self.offgrid_tiles,
+            'portal_pos': self.portal_pos,  # 保存 portal_pos
+
         }, f)
         f.close()
